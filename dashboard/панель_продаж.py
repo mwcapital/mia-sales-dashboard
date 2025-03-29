@@ -12,9 +12,7 @@ def load_data(uploaded_file):
     if uploaded_file is not None:
         # Check if the file is a ZIP file
         if uploaded_file.name.endswith('.zip'):
-            import zipfile
-            import io
-            
+ 
             # Open the zip file
             with zipfile.ZipFile(io.BytesIO(uploaded_file.getvalue())) as zip_ref:
                 # Get list of CSV files in the zip

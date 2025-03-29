@@ -1,0 +1,10 @@
+pandas
+streamlit
+plotly
+openpyxl
+python-dateutil
+fuzzywuzzy
+python-Levenshtein
+thefuzz
+bokeh
+scipy

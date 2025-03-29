@@ -8,5 +8,3 @@ python-Levenshtein
 thefuzz
 bokeh
 scipy
-
-io

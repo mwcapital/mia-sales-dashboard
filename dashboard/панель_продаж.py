@@ -9,15 +9,37 @@ from functions import optimize_dataframe
 @st.cache_data
 def load_data(uploaded_file):
     if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file, encoding="cp1251", low_memory=False, index_col=0, sep=';', parse_dates=True)
+        # Check if the file is a ZIP file
+        if uploaded_file.name.endswith('.zip'):
+            import zipfile
+            import io
+            
+            # Open the zip file
+            with zipfile.ZipFile(io.BytesIO(uploaded_file.getvalue())) as zip_ref:
+                # Get list of CSV files in the zip
+                csv_files = [f for f in zip_ref.namelist() if f.endswith('.csv')]
+                
+                if not csv_files:
+                    st.error("No CSV files found in the ZIP archive.")
+                    return None
+                
+                # Open the first CSV file in the zip
+                with zip_ref.open(csv_files[0]) as csv_file:
+                    # Read the CSV file
+                    df = pd.read_csv(csv_file, encoding="cp1251", low_memory=False, index_col=0, sep=';', parse_dates=True)
+        else:
+            # Regular CSV file processing
+            df = pd.read_csv(uploaded_file, encoding="cp1251", low_memory=False, index_col=0, sep=';', parse_dates=True)
+        
+        # Process the data
         df["product"] = df["product"].apply(eval)  # Convert to tuple
         df["продукция"] = df["product"].apply(lambda x: x[0])
         df["вид продукции"] = df["product"].apply(lambda x: x[1])
         return df
     return None
 
-# Add file uploader to the Streamlit app
-uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
+# Add file uploader to accept both CSV and ZIP files
+uploaded_file = st.file_uploader("Upload your CSV file (or zipped CSV)", type=["csv", "zip"])
 # Load data when file is uploaded
 if uploaded_file is not None:
     df = load_data(uploaded_file)

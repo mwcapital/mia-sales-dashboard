@@ -4,7 +4,8 @@ import plotly.express as px
 from functions import optimize_dataframe
 # At the top of your script, before creating the file uploader
 # Increase file upload limit to 1GB (or your desired size)
-
+import zipfile
+import io
 
 @st.cache_data
 def load_data(uploaded_file):

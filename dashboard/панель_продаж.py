@@ -30,7 +30,7 @@ def load_data(uploaded_file):
         return None
 
 # Add file uploader to accept both CSV and ZIP files
-uploaded_file = st.file_uploader("Upload your CSV file (or zipped CSV)", type=["csv", "zip"])
+uploaded_file = st.file_uploader("Upload your CSV file (or zipped CSV)", type=["csv"])
 # Load data when file is uploaded
 if uploaded_file is not None:
     df = load_data(uploaded_file)

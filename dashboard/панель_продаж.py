@@ -9,16 +9,25 @@ import io
 
 @st.cache_data
 def load_data(uploaded_file):
-    if uploaded_file is not None:
-        # Regular CSV file processing
-        df = pd.read_csv(uploaded_file, encoding="cp1251", low_memory=False, index_col=0, sep=';', parse_dates=True)
-        
-        # Process the data
-        df["product"] = df["product"].apply(eval)  # Convert to tuple
-        df["продукция"] = df["product"].apply(lambda x: x[0])
-        df["вид продукции"] = df["product"].apply(lambda x: x[1])
-    
-    return df
+    try:
+        if uploaded_file is not None:
+            # Regular CSV file processing
+            df = pd.read_csv(uploaded_file, encoding="cp1251", low_memory=False, index_col=0, sep=';', parse_dates=True)
+            
+            # Process the product column safely
+            if "product" in df.columns:
+                try:
+                    # Safely convert to tuple with error handling
+                    df["product"] = df["product"].apply(lambda x: eval(str(x)) if pd.notna(x) else None)
+                    df["продукция"] = df["product"].apply(lambda x: x[0] if isinstance(x, tuple) and len(x) > 0 else None)
+                    df["вид продукции"] = df["product"].apply(lambda x: x[1] if isinstance(x, tuple) and len(x) > 1 else None)
+                except Exception as e:
+                    st.warning(f"Error processing 'product' column: {str(e)}")
+            
+            return df
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
+        return None
 
 # Add file uploader to accept both CSV and ZIP files
 uploaded_file = st.file_uploader("Upload your CSV file (or zipped CSV)", type=["csv", "zip"])
